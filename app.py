@@ -66,22 +66,7 @@ occasion_accessories = {
     'Travel': ['Duffel Bag', 'Comfortable Sneakers', 'Crossbody Bag', 'Travel Hat']
 }
 
-outfit_images = {
-    't-shirt': 'images/tshirt.jpg',
-    'shirt': 'images/shirt.jpg',
-    'blouse': 'images/blouse.jpg',
-    'jeans': 'images/jeans.jpg',
-    'trousers': 'images/trousers.jpg',
-    'shorts': 'images/shorts.jpg',
-    'sneakers': 'images/sneakers.jpg',
-    'formal shoes': 'images/formal_shoes.jpg',
-    'sandals': 'images/sandals.jpg',
-    'flip flops': 'images/flip_flops.jpg'
-}
 
-# -------------------------------------------
-# Functions
-# -------------------------------------------
 
 def closest_skin_tone(avg_rgb):
     ref_tones = {
@@ -114,13 +99,13 @@ def recommend_outfits(gender, occasion, skin_tone):
 
     filtered = fashion_data[
         (fashion_data['gender'].str.lower() == gender.lower()) &
-        (fashion_data['basecolour'].isin(recommended_colors)) &
+        (fashion_data['baseColour'].isin(recommended_colors)) &
         (fashion_data['usage'].isin(allowed_usages))
     ]
 
-    topwear = filtered[filtered['subcategory'].str.contains('topwear', case=False, na=False)]
-    bottomwear = filtered[filtered['subcategory'].str.contains('bottomwear', case=False, na=False)]
-    footwear = filtered[filtered['mastercategory'].str.contains('footwear', case=False, na=False)]
+    topwear = filtered[filtered['subCategory'].str.contains('topwear', case=False, na=False)]
+    bottomwear = filtered[filtered['subCategory'].str.contains('bottomwear', case=False, na=False)]
+    footwear = filtered[filtered['masterCategory'].str.contains('footwear', case=False, na=False)]
 
     outfit_combinations = []
 
@@ -128,8 +113,8 @@ def recommend_outfits(gender, occasion, skin_tone):
         sampled_topwear = topwear.sample(min(5, len(topwear)))
 
         for top in sampled_topwear.itertuples():
-            harmonious_colors = color_wheel.get(top.basecolour, recommended_colors)
-            matching_bottomwear = bottomwear[bottomwear['basecolour'].isin(harmonious_colors)]
+            harmonious_colors = color_wheel.get(top.baseColour, recommended_colors)
+            matching_bottomwear = bottomwear[bottomwear['baseColour'].isin(harmonious_colors)]
 
             if matching_bottomwear.empty:
                 matching_bottomwear = bottomwear
@@ -138,9 +123,9 @@ def recommend_outfits(gender, occasion, skin_tone):
                 matching_footwear = footwear.sample(min(2, len(footwear)))
                 for foot in matching_footwear.itertuples():
                     outfit_combinations.append({
-                        'Topwear': top.productdisplayname,
-                        'Bottomwear': bottom.productdisplayname,
-                        'Footwear': foot.productdisplayname
+                        'Topwear': top.productDisplayName,
+                        'Bottomwear': bottom.productDisplayName,
+                        'Footwear': foot.productDisplayName
                     })
     return outfit_combinations
 
@@ -198,10 +183,10 @@ if uploaded_file is not None:
                 st.write(f"👟 Footwear: {outfit['Footwear']}")
 
                 # Display outfit images
-                for part in ['Topwear', 'Bottomwear', 'Footwear']:
-                    for keyword, img_path in outfit_images.items():
-                        if keyword in outfit[part].lower() and os.path.exists(img_path):
-                            st.image(img_path, width=150)
+                # for part in ['Topwear', 'Bottomwear', 'Footwear']:
+                #     for keyword, img_path in outfit_images.items():
+                #         if keyword in outfit[part].lower() and os.path.exists(img_path):
+                #             st.image(img_path, width=150)
 
                 # Accessories
                 accessories = occasion_accessories.get(occasion.capitalize(), [])
