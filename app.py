@@ -1,16 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-# app.py - Streamlit Fashion Recommendation System
 import streamlit as st
 import pandas as pd
 import numpy as np
 import cv2
-from PIL import Image as PILImage
-import os
 
 # -------------------------------------------
 # Setup
@@ -19,7 +10,7 @@ import os
 st.set_page_config(page_title="Fashion Recommendation App", page_icon="👗")
 
 st.title("👗 Personalized Fashion Recommendation System")
-st.write("Upload your face photo, and we'll suggest outfits and accessories just for you!")
+st.write("Upload your face photo, and we'll suggest stylish outfits and accessories just for you!")
 
 # -------------------------------------------
 # Load Dataset
@@ -27,7 +18,7 @@ st.write("Upload your face photo, and we'll suggest outfits and accessories just
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv('style.csv')
+    df = pd.read_csv('style.csv')  # Using your uploaded dataset
     df = df.dropna(subset=['gender', 'masterCategory', 'baseColour', 'usage'])
     return df
 
@@ -62,11 +53,12 @@ occasion_accessories = {
     'Formal': ['Leather Belt', 'Wrist Watch', 'Formal Shoes', 'Minimalist Tie'],
     'Party': ['Statement Necklace', 'Clutch Bag', 'Heels', 'Dangly Earrings'],
     'Ethnic': ['Bangles', 'Ethnic Dupatta', 'Kolhapuri Chappals', 'Bindis'],
-    'Sports': ['Sports Watch', 'Cap', 'Training Shoes', 'Sweatbands'],
     'Travel': ['Duffel Bag', 'Comfortable Sneakers', 'Crossbody Bag', 'Travel Hat']
 }
 
-
+# -------------------------------------------
+# Utility Functions
+# -------------------------------------------
 
 def closest_skin_tone(avg_rgb):
     ref_tones = {
@@ -88,11 +80,10 @@ def recommend_outfits(gender, occasion, skin_tone):
     recommended_colors = skin_tone_to_color_palette.get(skin_tone, [])
     
     occasion_mapping = {
-        'Casual': ['Casual', 'Travel', 'Sports'],
+        'Casual': ['Casual'],
         'Formal': ['Formal'],
         'Party': ['Party'],
         'Ethnic': ['Ethnic'],
-        'Sports': ['Sports'],
         'Travel': ['Travel']
     }
     allowed_usages = occasion_mapping.get(occasion, ['Casual'])
@@ -138,7 +129,7 @@ st.sidebar.header("Upload your Details")
 uploaded_file = st.sidebar.file_uploader("Upload a face photo", type=["jpg", "jpeg", "png"])
 
 gender = st.sidebar.selectbox("Select Gender", ["Men", "Women"])
-occasion = st.sidebar.selectbox("Select Occasion", ["Casual", "Formal", "Party", "Ethnic", "Sports", "Travel"])
+occasion = st.sidebar.selectbox("Select Occasion", ["Casual", "Formal", "Party", "Ethnic", "Travel"])
 
 # -------------------------------------------
 # Main Logic
@@ -182,13 +173,6 @@ if uploaded_file is not None:
                 st.write(f"👖 Bottomwear: {outfit['Bottomwear']}")
                 st.write(f"👟 Footwear: {outfit['Footwear']}")
 
-                # Display outfit images
-                # for part in ['Topwear', 'Bottomwear', 'Footwear']:
-                #     for keyword, img_path in outfit_images.items():
-                #         if keyword in outfit[part].lower() and os.path.exists(img_path):
-                #             st.image(img_path, width=150)
-
-                # Accessories
                 accessories = occasion_accessories.get(occasion.capitalize(), [])
                 st.write("🎒 Accessories you can pair:")
                 for acc in accessories[:3]:
@@ -200,4 +184,3 @@ if uploaded_file is not None:
 
 else:
     st.info("Please upload a face photo to begin.")
-
